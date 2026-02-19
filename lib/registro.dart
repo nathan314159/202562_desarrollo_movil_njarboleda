@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:parcial_pucetec/helper.dart'; // Aquí importamos tu helper
+import 'package:parcial_pucetec/helper.dart'; // Tu helper de validaciones
 
 void main() {
   runApp(const RegistroPage());
@@ -11,7 +11,7 @@ class RegistroPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Formulario de Validación',
+      title: 'Formulario de Registro',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: const MyFormPage(),
     );
@@ -27,38 +27,43 @@ class MyFormPage extends StatefulWidget {
 
 class _MyFormPageState extends State<MyFormPage> {
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _cedulaController = TextEditingController();
+  final TextEditingController _nombreController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _repeatPasswordController = TextEditingController();
 
   @override
   void dispose() {
     _cedulaController.dispose();
+    _nombreController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _repeatPasswordController.dispose();
     super.dispose();
   }
 
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Formulario válido ✅')),
+        const SnackBar(content: Text('Registro exitoso ✅')),
       );
+      // Aquí podrías agregar lógica para guardar los datos
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Validación con Helper')),
+      appBar: AppBar(title: const Text('Registro')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-
+              // Cédula
               TextFormField(
                 controller: _cedulaController,
                 keyboardType: TextInputType.number,
@@ -76,8 +81,23 @@ class _MyFormPageState extends State<MyFormPage> {
                 },
               ),
               const SizedBox(height: 16),
-              
-              
+
+              // Nombre completo
+              TextFormField(
+                controller: _nombreController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre completo',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Campo requerido';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Correo
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -96,7 +116,7 @@ class _MyFormPageState extends State<MyFormPage> {
               ),
               const SizedBox(height: 16),
 
-
+              // Contraseña
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
@@ -113,11 +133,31 @@ class _MyFormPageState extends State<MyFormPage> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16),
+
+              // Repetir contraseña
+              TextFormField(
+                controller: _repeatPasswordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Repetir contraseña',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Campo requerido';
+                  }
+                  if (value != _passwordController.text) {
+                    return 'Las contraseñas no coinciden';
+                  }
+                  return null;
+                },
+              ),
               const SizedBox(height: 32),
 
+              // Botón registrar
               ElevatedButton(
                 onPressed: _submitForm,
-                child: const Text('Validar'),
+                child: const Text('Registrar'),
               ),
             ],
           ),
