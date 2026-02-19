@@ -54,6 +54,7 @@ class _MyFormPageState extends State<MyFormPage> {
 
       // Navegar al Dashboard después de validar
       Future.delayed(const Duration(milliseconds: 500), () {
+        if (!mounted) return; // ✅ Protección contra contexto no montado
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const DashboardPage()),
@@ -62,11 +63,23 @@ class _MyFormPageState extends State<MyFormPage> {
     }
   }
 
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) return 'Campo requerido';
+    if (value.length < 6) return 'La contraseña debe tener al menos 6 caracteres';
+    return null;
+  }
+
+  String? _validateRepeatPassword(String? value) {
+    if (value == null || value.isEmpty) return 'Campo requerido';
+    if (value != _passwordController.text) return 'Las contraseñas no coinciden';
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Registro')),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
@@ -122,11 +135,7 @@ class _MyFormPageState extends State<MyFormPage> {
                 decoration: const InputDecoration(
                   labelText: 'Contraseña',
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Campo requerido';
-                  if (!Validators.password(value)) return 'La contraseña debe tener al menos 6 caracteres';
-                  return null;
-                },
+                validator: _validatePassword,
               ),
               const SizedBox(height: 16),
 
@@ -137,11 +146,7 @@ class _MyFormPageState extends State<MyFormPage> {
                 decoration: const InputDecoration(
                   labelText: 'Repetir contraseña',
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'Campo requerido';
-                  if (value != _passwordController.text) return 'Las contraseñas no coinciden';
-                  return null;
-                },
+                validator: _validateRepeatPassword,
               ),
               const SizedBox(height: 32),
 
